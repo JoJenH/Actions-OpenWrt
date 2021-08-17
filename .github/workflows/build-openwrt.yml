@@ -112,6 +112,13 @@ jobs:
     - name: Check space usage
       if: (!cancelled())
       run: df -hT
+      
+    - name: Upload config file(.config)
+      uses: actions/upload-artifact@main
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      with:
+        name: OpenWrt_config${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: openwrt/.config
 
     - name: Upload bin directory
       uses: actions/upload-artifact@main
@@ -126,6 +133,7 @@ jobs:
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
+        cp ~/openwrt/.config ./config_file
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
